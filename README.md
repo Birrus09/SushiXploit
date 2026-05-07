@@ -1,21 +1,30 @@
-# SushiXploit
-Exploit di un applicazione web vulnerabile per la gestione degli ordini di un locale di cucina orientale
+# SushiXploit Order App
 
+A simple LAN-friendly Sushi restaurant order application.
 
+## Features
 
+- `GET /auth_create` shows a page to select a table and creates a unique code stored in a browser cookie.
+- `GET /` shows an interactive ordering page if authorized, with buttons and placeholder images for sushi types.
+- Order submission is via `POST /order/:tableId` with JSON body, handled by JavaScript fetch.
+- Only requests from the same IP and cookie code can order for the selected table.
+- Successful orders are added to ORDERS list as [type, count] tuples.
+- Server listens on `0.0.0.0` so it is reachable on the LAN.
 
-**Disclaimer Legale e di Utilizzo**
+## Install
 
-Il presente progetto è stato sviluppato esclusivamente per finalità educative e di studio nell’ambito della sicurezza informatica. L’applicazione web oggetto di analisi e il relativo exploit sono una ricreazione simulata.
+1. Open a terminal in this folder.
+2. Run `npm install`.
 
-L’autore dichiara espressamente di non autorizzare, incoraggiare o supportare l’utilizzo delle tecniche, del codice o delle metodologie descritte per scopi illeciti, dannosi o non autorizzati. Qualsiasi utilizzo improprio delle informazioni contenute in questo progetto è da considerarsi esclusivamente sotto la responsabilità dell’utilizzatore finale.
+## Run
 
-Si sottolinea che l’analisi di sicurezza e il testing di vulnerabilità devono essere effettuati esclusivamente su sistemi per i quali si dispone di esplicita autorizzazione. Qualsiasi attività condotta su sistemi terzi senza consenso può costituire violazione delle normative vigenti.
+`npm start`
 
-Proseguendo nella lettura o nell’utilizzo di questo progetto, l’utente accetta integralmente i termini sopra indicati.
+## Usage
 
-
-
-
-
-
+1. Browse to `http://<server-ip>:3000/auth_create`.
+2. Enter a table number.
+3. The authorization code is automatically stored in your browser cookie.
+4. Browse to `http://<server-ip>:3000/` to see the ordering interface.
+5. Select quantities and click order buttons for different sushi types.
+6. Orders are sent automatically and responses are shown on the page.
