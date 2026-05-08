@@ -8,30 +8,31 @@
 </head>
 <body>
   <div class="container">
-    <h1>Sushi Restaurant Order App</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h1>Sushi Restaurant Order App</h1>
+      <button id="status-btn" onclick="openStatusModal()" title="View table status" style="background: none; border: none; cursor: pointer; font-size: 24px; padding: 10px;">📋</button>
+    </div>
     <div id="table-info" class="table-info">Checking authorization...</div>
     <div id="content" style="display:none;">
       <div class="sushi-grid">
         <div class="sushi-item">
-          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U2FsbW9uPC90ZXh0Pjwvc3ZnPg==" alt="Salmon Sushi">
+          <img src="/pics/nigiri_salmon.jpg" alt="Salmon Sushi">
           <h3>Salmon Sushi</h3>
           <div class="quantity-controls">
             <button onclick="changeQuantity('salmon', -1)">-</button>
-            <span id="salmon-qty">1</span>
+            <span id="salmon-qty">0</span>
             <button onclick="changeQuantity('salmon', 1)">+</button>
           </div>
-          <button class="order-btn" onclick="placeOrder('salmon', event)">Order Salmon Sushi</button>
         </div>
 
         <div class="sushi-item">
-          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VHVuYTwvdGV4dD48L3N2Zz4=" alt="Tuna Sushi">
+          <img src="/pics/hosomaki_tuna.jpg" alt="Tuna Sushi">
           <h3>Tuna Sushi</h3>
           <div class="quantity-controls">
             <button onclick="changeQuantity('tuna', -1)">-</button>
-            <span id="tuna-qty">1</span>
+            <span id="tuna-qty">0</span>
             <button onclick="changeQuantity('tuna', 1)">+</button>
           </div>
-          <button class="order-btn" onclick="placeOrder('tuna', event)">Order Tuna Sushi</button>
         </div>
 
         <div class="sushi-item">
@@ -39,10 +40,9 @@
           <h3>Avocado Sushi</h3>
           <div class="quantity-controls">
             <button onclick="changeQuantity('avocado', -1)">-</button>
-            <span id="avocado-qty">1</span>
+            <span id="avocado-qty">0</span>
             <button onclick="changeQuantity('avocado', 1)">+</button>
           </div>
-          <button class="order-btn" onclick="placeOrder('avocado', event)">Order Avocado Sushi</button>
         </div>
 
         <div class="sushi-item">
@@ -50,34 +50,59 @@
           <h3>California Sushi</h3>
           <div class="quantity-controls">
             <button onclick="changeQuantity('california', -1)">-</button>
-            <span id="california-qty">1</span>
+            <span id="california-qty">0</span>
             <button onclick="changeQuantity('california', 1)">+</button>
           </div>
-          <button class="order-btn" onclick="placeOrder('california', event)">Order California Sushi</button>
         </div>
       </div>
+      <div style="margin-top: 24px; margin-bottom: 20px;">
+        <label for="order-notes" style="display: block; margin-bottom: 8px; font-weight: 600;">Special Instructions (Optional)</label>
+        <textarea id="order-notes" placeholder="Add any special requests or notes here..." style="width: 100%; min-height: 80px; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-family: inherit; font-size: 1rem;"></textarea>
+      </div>
+      <button class="order-btn" onclick="sendOrder(event)" style="width: 100%;">Send Order</button>
       <div id="message"></div>
     </div>
   </div>
 
+  <!-- Status Modal -->
+  <div id="status-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Table Status</h2>
+        <button onclick="closeStatusModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
+      </div>
+      <div id="status-content" style="margin-bottom: 20px;"></div>
+      <button onclick="closeStatusModal()" style="width: 100%; padding: 10px; background: #6366f1; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
+    </div>
+  </div>
+
   <script>
+    let currentTableId = null;
     const quantities = {
-      salmon: 1,
-      tuna: 1,
-      avocado: 1,
-      california: 1
+      salmon: 0,
+      tuna: 0,
+      avocado: 0,
+      california: 0
     };
 
     function changeQuantity(type, delta) {
-      quantities[type] = Math.max(1, quantities[type] + delta);
+      quantities[type] = Math.max(0, quantities[type] + delta);
       document.getElementById(type + '-qty').textContent = quantities[type];
     }
 
-    async function placeOrder(type, event) {
-      const count = quantities[type];
+    async function sendOrder(event) {
+      const itemsToOrder = Object.entries(quantities)
+        .filter(([_, count]) => count > 0);
+
+      if (itemsToOrder.length === 0) {
+        alert('Please select at least one item');
+        return;
+      }
+
+      const notes = document.getElementById('order-notes').value.trim();
       const btn = event.currentTarget;
       btn.disabled = true;
-      btn.textContent = 'Ordering...';
+      btn.textContent = 'Sending...';
 
       try {
         const statusResponse = await fetch('/auth_status');
@@ -87,23 +112,43 @@
           return;
         }
 
-        const response = await fetch('/order/' + status.tableId, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ count, type: type + ' sushi' })
-        });
+        // Send a separate request for each sushi type
+        const requests = itemsToOrder.map(([type, count]) =>
+          fetch('/order/' + status.tableId, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              items: [{ type: type + ' sushi', count: count }],
+              notes: notes || undefined
+            })
+          })
+        );
 
-        const result = await response.json();
+        const responses = await Promise.all(requests);
         const messageDiv = document.getElementById('message');
 
-        if (response.ok) {
+        // Check if all requests were successful
+        const allSuccess = responses.every(res => res.ok);
+        
+        if (allSuccess) {
           messageDiv.className = 'success';
-          messageDiv.textContent = 'Order successful: ' + result.message;
+          messageDiv.textContent = `Order sent successfully! (${itemsToOrder.length} request${itemsToOrder.length !== 1 ? 's' : ''})`;
+          
+          // Reset quantities and notes
+          Object.keys(quantities).forEach(key => quantities[key] = 0);
+          document.querySelectorAll('[id$="-qty"]').forEach(el => el.textContent = '0');
+          document.getElementById('order-notes').value = '';
+          
+          // Show message for a few seconds
+          setTimeout(() => {
+            messageDiv.textContent = '';
+            messageDiv.className = '';
+          }, 3000);
         } else {
           messageDiv.className = 'error';
-          messageDiv.textContent = 'Order failed: ' + (result.error || 'Unknown error');
+          messageDiv.textContent = 'Order failed: Some requests did not succeed';
         }
       } catch (error) {
         const messageDiv = document.getElementById('message');
@@ -111,8 +156,54 @@
         messageDiv.textContent = 'Order failed: Network error';
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Order ' + type.charAt(0).toUpperCase() + type.slice(1) + ' Sushi';
+        btn.textContent = 'Send Order';
       }
+    }
+
+    async function openStatusModal() {
+      const modal = document.getElementById('status-modal');
+      const content = document.getElementById('status-content');
+      
+      try {
+        const response = await fetch('/table_status/' + currentTableId);
+        const data = await response.json();
+        
+        if (data.error) {
+          content.innerHTML = '<p style="color: red;">' + data.error + '</p>';
+        } else {
+          let html = '<h3>Table ' + data.tableId + '</h3>';
+          html += '<p><strong>Status:</strong> ' + data.status + '</p>';
+          
+          if (data.orders && data.orders.length > 0) {
+            html += '<h4>Orders:</h4>';
+            html += '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Item</th><th style="text-align: left; padding: 8px;">Qty</th><th style="text-align: left; padding: 8px;">Status</th><th style="text-align: left; padding: 8px;">Notes</th></tr>';
+            
+            data.orders.forEach(order => {
+              html += '<tr style="border-bottom: 1px solid #ddd;">';
+              html += '<td style="padding: 8px;">' + order.type + '</td>';
+              html += '<td style="padding: 8px;">' + order.count + '</td>';
+              html += '<td style="padding: 8px;">' + order.status + '</td>';
+              html += '<td style="padding: 8px;">' + (order.notes || '-') + '</td>';
+              html += '</tr>';
+            });
+            
+            html += '</table>';
+          } else {
+            html += '<p>No orders yet.</p>';
+          }
+          
+          content.innerHTML = html;
+        }
+      } catch (error) {
+        content.innerHTML = '<p style="color: red;">Failed to fetch table status</p>';
+      }
+      
+      modal.style.display = 'block';
+    }
+
+    function closeStatusModal() {
+      document.getElementById('status-modal').style.display = 'none';
     }
 
     async function init() {
@@ -125,6 +216,7 @@
           return;
         }
 
+        currentTableId = status.tableId;
         document.getElementById('table-info').textContent = 'Table: ' + status.tableId;
         document.getElementById('content').style.display = 'block';
       } catch (error) {
