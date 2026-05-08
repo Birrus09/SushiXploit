@@ -1,9 +1,14 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const app = express();
 const port = process.env.PORT || 3000;
+const logPath = path.join(__dirname, 'log.txt');
+
+// Overwrite log file at each execution
+fs.writeFileSync(logPath, `SushiXploit order log started ${new Date().toISOString()}\n`, 'utf8');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -74,17 +79,11 @@ app.post('/order/:tableId', (req, res) => {
     return res.status(403).json({ error: 'Orders for other tables are not allowed and are not possible to make thanks to our incredible security' });
   }
 
-  const { items, notes } = req.body;
+  const { type, count, notes } = req.body;
   
-  // Validate items array
-  if (!Array.isArray(items) || items.length === 0) {
-    return res.status(400).json({ error: 'Request JSON must include an items array with at least one item.' });
-  }
-
-  for (const item of items) {
-    if (typeof item.count !== 'number' || item.count <= 0 || typeof item.type !== 'string' || !item.type.trim()) {
-      return res.status(400).json({ error: 'Each item must have numeric count > 0 and string type.' });
-    }
+  // Validate request
+  if (typeof count !== 'number' || count <= 0 || typeof type !== 'string' || !type.trim()) {
+    return res.status(400).json({ error: 'Request JSON must include numeric count > 0 and string type.' });
   }
 
   if (notes !== undefined && typeof notes !== 'string') {
@@ -93,24 +92,28 @@ app.post('/order/:tableId', (req, res) => {
 
   const ip = getClientIp(req);
   
-  // Create order objects for each item
-  const orderObjects = items.map(item => ({
+  // Create order object
+  const order = {
     tableId,
-    ip,
-    type: item.type.trim(),
-    count: item.count,
+    type: type.trim(),
+    count: count,
     status: 'sent',
     notes: notes || null,
     placedAt: new Date().toISOString(),
-  }));
+  };
 
-  // Store orders by table
+  // Store order by table
   if (!ORDERS.has(tableId)) {
     ORDERS.set(tableId, []);
   }
-  ORDERS.get(tableId).push(...orderObjects);
+  ORDERS.get(tableId).push(order);
 
-  res.json({ message: 'Order accepted', orders: orderObjects });
+  // Append received order to the log file
+  fs.appendFileSync(logPath, `${new Date().toISOString()} ${JSON.stringify(order)}\n`, 'utf8');
+
+  console.log('Received order:', JSON.stringify(order, null, 2));
+
+  res.json({ message: 'Order accepted', order });
 });
 
 
