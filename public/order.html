@@ -120,7 +120,8 @@
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              items: [{ type: type + ' sushi', count: count }],
+              type: type + ' sushi',
+              count: count,
               notes: notes || undefined
             })
           })
@@ -134,7 +135,7 @@
         
         if (allSuccess) {
           messageDiv.className = 'success';
-          messageDiv.textContent = `Order sent successfully! (${itemsToOrder.length} request${itemsToOrder.length !== 1 ? 's' : ''})`;
+          messageDiv.textContent = 'Order sent!';
           
           // Reset quantities and notes
           Object.keys(quantities).forEach(key => quantities[key] = 0);
