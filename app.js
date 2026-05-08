@@ -109,7 +109,11 @@ app.post('/order/:tableId', (req, res) => {
   ORDERS.get(tableId).push(order);
 
   // Append received order to the log file
-  fs.appendFileSync(logPath, `${new Date().toISOString()} ${JSON.stringify(order)}\n`, 'utf8');
+  const now = new Date();
+  const hour = String(now.getHours()).padStart(2, '0');
+  const minute = String(now.getMinutes()).padStart(2, '0');
+  const noteText = order.notes || '';
+  fs.appendFileSync(logPath, `${hour}:${minute}  -  ${order.type}, ${order.count}, \t\t ${noteText}\n`, 'utf8');
 
   console.log('Received order:', JSON.stringify(order, null, 2));
 
