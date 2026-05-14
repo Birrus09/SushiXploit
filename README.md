@@ -13,3 +13,7 @@ Recreation of a vulnerable sushi restaurant application and relative exploit
 
 ## Run
 `npm start`
+
+
+## Run exploit
+`run exploit.py`
