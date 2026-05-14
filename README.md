@@ -16,4 +16,4 @@ Recreation of a vulnerable sushi restaurant application and relative exploit
 
 
 ## Run exploit
-`run exploit.py`
+run `exploit.py`
