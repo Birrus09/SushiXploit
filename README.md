@@ -1,5 +1,5 @@
 # SushiXploit Order App
-Recreation of a vulnerable sushi restaurant application and relative exploit
+Simulation of a vulnerable sushi restaurant application and relative exploit
 
 
 
